@@ -21,6 +21,28 @@ function animate() {
   ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.7)`;
   ctx.fill();
+
   requestAnimationFrame(animate);
 }
 animate();
+
+async function send() {
+  const inputBox = document.getElementById("userInput");
+  const log = document.getElementById("log");
+  const input = inputBox.value.trim();
+  if (!input) return;
+
+  log.innerHTML += `<div style="text-align:right;">🙋‍♂️ ${input}</div>`;
+  inputBox.value = "";
+
+  const res = await fetch("/api/ask", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ input })
+  });
+  const data = await res.json();
+  if (data.result) {
+    log.innerHTML += `<div style="text-align:left;">🤖 ${data.result}</div>`;
+    log.scrollTop = log.scrollHeight;
+  }
+}

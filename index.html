@@ -4,10 +4,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>URS Earth v2.0</title>
+  <title>URS Earth v2.0 - Interactive</title>
+  <style>
+    body { margin: 0; background-color: #000; color: white; font-family: sans-serif; }
+    #emotionCanvas { position: absolute; top: 0; left: 0; z-index: 0; }
+    .chatbox {
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      width: 90%; max-width: 600px; z-index: 2;
+    }
+    #log { height: 200px; overflow-y: auto; margin-bottom: 10px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; }
+    #userInput { width: 80%; padding: 10px; }
+    button { padding: 10px; width: 18%; }
+  </style>
 </head>
-<body style="margin:0; background-color:#000; overflow:hidden;">
-  <canvas id="emotionCanvas" style="width:100vw; height:100vh;"></canvas>
+<body>
+  <canvas id="emotionCanvas"></canvas>
+  <div class="chatbox">
+    <div id="log">[대화 로그 시작]</div>
+    <input type="text" id="userInput" placeholder="어스에게 말 걸기..." />
+    <button onclick="send()">보내기</button>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>

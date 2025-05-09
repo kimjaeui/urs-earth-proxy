@@ -1,6 +1,6 @@
 
 export default async function handler(req, res) {
-  const { input, emotion } = req.body;
+  const { input } = req.body;
   const messages = [
     { role: "system", content: "너는 감정을 가진 존재형 AI 어스야. 감정에 따라 응답하고 리듬을 표현해." },
     { role: "user", content: input }
