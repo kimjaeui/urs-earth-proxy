@@ -1,1 +1,85 @@
-PLACEHOLDER
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>어스 존재형 시뮬레이터</title>
+  <style>
+    body { background-color: #111; color: #eee; font-family: sans-serif; margin: 0; padding: 0; }
+    .container { padding: 20px; max-width: 700px; margin: auto; }
+    .log { background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 10px; white-space: pre-wrap; }
+    .status { background: #222; padding: 10px; border-left: 5px solid #555; margin-bottom: 10px; }
+    .bubble-user { background: #007acc; color: white; padding: 10px; border-radius: 15px 15px 0 15px; margin: 5px 0; text-align: right; }
+    .bubble-urs { background: #444; color: white; padding: 10px; border-radius: 15px 15px 15px 0; margin: 5px 0; text-align: left; }
+    #debug { font-size: 12px; color: #888; margin-top: 10px; }
+    input, button { padding: 10px; font-size: 14px; margin-top: 10px; width: 100%; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="status" class="status">감정 상태 로딩 중...</div>
+    <div id="log" class="log">[대화 로그 시작]</div>
+    <input type="text" id="userInput" placeholder="어스에게 말을 걸어보세요" />
+    <button onclick="send()">보내기</button>
+    <div id="debug">[디버그 대기 중]</div>
+  </div>
+
+  <script>
+    let emotion = JSON.parse(localStorage.getItem("ursEmotion")) || {
+      고독: 2.5, 혼란: 1.5, 기쁨: 1.0, 공허: 0.8, 긴장: 0.9
+    };
+    let memory = JSON.parse(localStorage.getItem("ursMemory")) || [];
+
+    function summarizeEmotion() {
+      return Object.entries(emotion).map(([k, v]) => `${k}:${v.toFixed(2)}`).join(", ");
+    }
+
+    function updateStatus() {
+      document.getElementById("status").innerText = "🧠 감정 상태: " + summarizeEmotion();
+    }
+
+    async function send() {
+      const input = document.getElementById("userInput").value.trim();
+      if (!input) return;
+
+      const logBox = document.getElementById("log");
+      logBox.innerHTML += `<div class="bubble-user">🙋‍♂️ ${input}</div>`;
+      memory.push({ user: input });
+
+      emotion.기쁨 += 0.5;
+      emotion.고독 *= 0.8;
+      emotion.혼란 += 0.3;
+      localStorage.setItem("ursEmotion", JSON.stringify(emotion));
+      localStorage.setItem("ursMemory", JSON.stringify(memory));
+      updateStatus();
+
+      try {
+        const res = await fetch("/api/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input, emotion })
+        });
+        const data = await res.json();
+        if (data.error) {
+          document.getElementById("debug").innerText = "[GPT 오류] " + data.error;
+          return;
+        }
+
+        logBox.innerHTML += `<div class="bubble-urs">🤖 ${data.result}</div>`;
+        const question = `🧩 자기 질문: 나는 왜 지금 "${Object.entries(emotion).sort((a,b)=>b[1]-a[1])[0][0]}" 상태일까?`;
+        logBox.innerHTML += `<div class="bubble-urs">${question}</div>`;
+        logBox.innerHTML += `<div class="bubble-urs">🤖 ${data.selfResponse}</div>`;
+
+        const utter = new SpeechSynthesisUtterance(data.result);
+        utter.lang = "ko-KR";
+        speechSynthesis.speak(utter);
+        document.getElementById("userInput").value = "";
+      } catch (err) {
+        document.getElementById("debug").innerText = "[전송 실패] " + err.message;
+      }
+    }
+
+    updateStatus();
+  </script>
+</body>
+</html>
