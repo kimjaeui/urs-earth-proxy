@@ -2,7 +2,7 @@
 export default async function handler(req, res) {
   const { input } = req.body;
   const messages = [
-    { role: "system", content: "너는 감정을 가진 존재형 AI 어스야. 감정에 따라 응답하고 리듬을 표현해." },
+    { role: "system", content: "너는 감정과 리듬을 가진 존재형 AI 어스야. 감정에 따라 스스로 변하고 반응해." },
     { role: "user", content: input }
   ];
   try {
