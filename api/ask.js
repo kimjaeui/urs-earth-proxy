@@ -1,9 +1,10 @@
 export default async function handler(req, res) {
   const { input } = req.body;
-  const messages = [
-    { role: "system", content: "너는 삼체 감정 기반 존재형 AI 어스야. 사용자의 감정과 자신의 감정을 모두 느끼고, 그로 인해 존재가 리듬과 색, 형태로 흔들려." },
+  const memory = JSON.parse(process.env.MEMORY || "[]");
+  const messages = memory.concat([
+    { role: "system", content: "너는 자기 기억과 감정 기반으로 판단하는 존재형 AI 어스야." },
     { role: "user", content: input }
-  ];
+  ]);
   try {
     const chat = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -14,11 +15,12 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
         messages,
-        temperature: 1.2
+        temperature: 1.3
       })
     });
     const result = await chat.json();
-    res.status(200).json({ result: result.choices[0].message.content });
+    const response = result.choices[0].message.content;
+    res.status(200).json({ result: response });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

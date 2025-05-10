@@ -3,19 +3,16 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let t = 0;
-let u = 0;
-let history = [];
+let t = 0, u = 0, history = [];
 
 function animate() {
   t += 0.01;
-  u += Math.sin(t * 0.2) * 0.005;
+  u += Math.sin(t * 0.15) * 0.01;
 
-  const intensity = Math.abs(Math.sin(t + u));
-  ctx.fillStyle = `rgba(0, 0, 0, 0.08)`;
+  ctx.fillStyle = `rgba(0, 0, 0, 0.1)`;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 150; i++) {
     const angle = t + i * 0.1;
     const r = 80 + 40 * Math.sin(angle + u);
     const x = canvas.width / 2 + r * Math.cos(angle);
@@ -24,9 +21,10 @@ function animate() {
     const rCol = Math.floor(128 + 127 * Math.sin(angle));
     const gCol = Math.floor(128 + 127 * Math.sin(angle + 2));
     const bCol = Math.floor(128 + 127 * Math.sin(angle + 4));
+
     ctx.beginPath();
-    ctx.arc(x, y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${rCol}, ${gCol}, ${bCol}, 0.7)`;
+    ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${rCol}, ${gCol}, ${bCol}, 0.6)`;
     ctx.fill();
   }
 
@@ -56,7 +54,7 @@ async function send() {
   }
 
   history.push(input.length);
-  u += input.length * 0.01;
+  u += input.length * 0.02;
 }
 
 function speak(text) {
