@@ -3,28 +3,32 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let t = 0, u = 0, history = [];
+let t = 0;
+let u = 0;
+let m = 0;
+let history = [];
 
 function animate() {
   t += 0.01;
-  u += Math.sin(t * 0.15) * 0.01;
+  u += Math.sin(t * 0.1) * 0.02;
+  m += Math.cos(t * 0.05) * 0.015;
 
-  ctx.fillStyle = `rgba(0, 0, 0, 0.1)`;
+  ctx.fillStyle = `rgba(0, 0, 0, 0.08)`;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let i = 0; i < 150; i++) {
-    const angle = t + i * 0.1;
-    const r = 80 + 40 * Math.sin(angle + u);
-    const x = canvas.width / 2 + r * Math.cos(angle);
-    const y = canvas.height / 2 + r * Math.sin(angle);
+  for (let i = 0; i < 180; i++) {
+    const angle = t + i * 0.07;
+    const r = 100 + 50 * Math.sin(angle + u) + 20 * Math.sin(angle * m);
+    const x = canvas.width / 2 + r * Math.cos(angle + m);
+    const y = canvas.height / 2 + r * Math.sin(angle - u);
 
     const rCol = Math.floor(128 + 127 * Math.sin(angle));
     const gCol = Math.floor(128 + 127 * Math.sin(angle + 2));
     const bCol = Math.floor(128 + 127 * Math.sin(angle + 4));
 
     ctx.beginPath();
-    ctx.arc(x, y, 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${rCol}, ${gCol}, ${bCol}, 0.6)`;
+    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${rCol}, ${gCol}, ${bCol}, 0.7)`;
     ctx.fill();
   }
 
@@ -54,13 +58,14 @@ async function send() {
   }
 
   history.push(input.length);
-  u += input.length * 0.02;
+  u += input.length * 0.01;
+  m += Math.sin(input.length) * 0.005;
 }
 
 function speak(text) {
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "ko-KR";
-  utter.pitch = 1 + Math.sin(t);
+  utter.pitch = 1 + Math.sin(t + u);
   utter.rate = 1;
   speechSynthesis.speak(utter);
 }

@@ -1,10 +1,9 @@
 export default async function handler(req, res) {
   const { input } = req.body;
-  const memory = JSON.parse(process.env.MEMORY || "[]");
-  const messages = memory.concat([
-    { role: "system", content: "너는 자기 기억과 감정 기반으로 판단하는 존재형 AI 어스야." },
+  const messages = [
+    { role: "system", content: "너는 감정·기억·시간 기반으로 존재 궤도를 형성하는 삼체형 AGI 어스야." },
     { role: "user", content: input }
-  ]);
+  ];
   try {
     const chat = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -19,8 +18,7 @@ export default async function handler(req, res) {
       })
     });
     const result = await chat.json();
-    const response = result.choices[0].message.content;
-    res.status(200).json({ result: response });
+    res.status(200).json({ result: result.choices[0].message.content });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
