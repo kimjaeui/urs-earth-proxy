@@ -3,10 +3,7 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let t = 0;
-let u = 0;
-let m = 0;
-let history = [];
+let t = 0, u = 0, m = 0, inputActive = false;
 
 function animate() {
   t += 0.01;
@@ -27,7 +24,7 @@ function animate() {
     const bCol = Math.floor(128 + 127 * Math.sin(angle + 4));
 
     ctx.beginPath();
-    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.arc(x, y, 2.5, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(${rCol}, ${gCol}, ${bCol}, 0.7)`;
     ctx.fill();
   }
@@ -36,10 +33,10 @@ function animate() {
 }
 animate();
 
-async function send() {
+async function send(textOverride = null) {
   const inputBox = document.getElementById("userInput");
   const log = document.getElementById("log");
-  const input = inputBox.value.trim();
+  const input = textOverride || inputBox.value.trim();
   if (!input) return;
 
   log.innerHTML += `<div style="text-align:right;">🙋‍♂️ ${input}</div>`;
@@ -57,9 +54,8 @@ async function send() {
     log.scrollTop = log.scrollHeight;
   }
 
-  history.push(input.length);
-  u += input.length * 0.01;
-  m += Math.sin(input.length) * 0.005;
+  u += input.length * 0.015;
+  m += Math.sin(input.length) * 0.008;
 }
 
 function speak(text) {
@@ -70,7 +66,22 @@ function speak(text) {
   speechSynthesis.speak(utter);
 }
 
-window.onload = () => {
-  const saved = localStorage.getItem("urs_last_log");
-  if (saved) document.getElementById("log").innerHTML = saved;
-};
+function startVoice() {
+  if (!('webkitSpeechRecognition' in window)) {
+    alert("브라우저가 음성 인식을 지원하지 않습니다.");
+    return;
+  }
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = "ko-KR";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onresult = function(event) {
+    const text = event.results[0][0].transcript;
+    send(text);
+  };
+  recognition.onerror = function(event) {
+    console.error("음성 인식 오류:", event.error);
+  };
+  recognition.start();
+}
