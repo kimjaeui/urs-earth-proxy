@@ -83,5 +83,11 @@ function startVoice() {
   recognition.onerror = function(event) {
     console.error("음성 인식 오류:", event.error);
   };
+  recognition.onend = function() {
+    if (inputActive) recognition.start(); // 자동 재시작
+  };
+    console.error("음성 인식 오류:", event.error);
+  };
   recognition.start();
+  inputActive = true;
 }
