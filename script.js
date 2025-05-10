@@ -1,7 +1,7 @@
 let nodes = new vis.DataSet([]);
 let edges = new vis.DataSet([]);
 let nodeId = 1;
-let lastNode = null;
+let lastUserNode = null;
 
 const container = document.getElementById("graph");
 const data = { nodes, edges };
@@ -13,7 +13,7 @@ const options = {
     borderWidth: 2
   },
   edges: {
-    color: "#888",
+    color: { inherit: false },
     smooth: { type: "continuous" }
   },
   physics: {
@@ -21,9 +21,9 @@ const options = {
     stabilization: false,
     barnesHut: {
       gravitationalConstant: -30000,
-      centralGravity: 0.3,
-      springLength: 200,
-      springConstant: 0.04
+      centralGravity: 0.4,
+      springLength: 150,
+      springConstant: 0.03
     }
   }
 };
@@ -35,33 +35,42 @@ async function send(textOverride = null) {
   const input = textOverride || inputBox.value.trim();
   if (!input) return;
 
-  const userNode = { id: nodeId++, label: input, color: "#ff9999" };
+  const userNode = { id: nodeId++, label: input, color: "#ffaa88" };
   nodes.add(userNode);
-  if (lastNode) edges.add({ from: lastNode.id, to: userNode.id });
-  lastNode = userNode;
+  if (lastUserNode) edges.add({ from: lastUserNode.id, to: userNode.id });
+  lastUserNode = userNode;
 
   inputBox.value = "";
 
-  const res = await fetch("/api/ask", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ input })
-  });
-  const data = await res.json();
+  try {
+    const res = await fetch("/api/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input })
+    });
+    const data = await res.json();
 
-  const response = data.result || "(응답 없음)";
-  const aiNode = { id: nodeId++, label: response, color: "#99ccff" };
-  nodes.add(aiNode);
-  edges.add({ from: userNode.id, to: aiNode.id });
-  lastNode = aiNode;
+    const response = data.result || "(응답 없음)";
+    const aiNode = { id: nodeId++, label: response, color: "#88ccff" };
+    nodes.add(aiNode);
+    edges.add({ from: userNode.id, to: aiNode.id });
 
-  speak(response);
+    const selfQuestion = { id: nodeId++, label: "왜 "" + input + "" 라고 했을까?", color: "#cc99ff" };
+    nodes.add(selfQuestion);
+    edges.add({ from: aiNode.id, to: selfQuestion.id });
+
+    speak(response);
+  } catch (e) {
+    const errorNode = { id: nodeId++, label: "[GPT 오류: " + e.message + "]", color: "#ff4444" };
+    nodes.add(errorNode);
+    edges.add({ from: userNode.id, to: errorNode.id });
+  }
 }
 
 function speak(text) {
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "ko-KR";
-  utter.pitch = 1 + Math.sin(nodeId);
+  utter.pitch = 1 + Math.sin(nodeId * 0.1);
   utter.rate = 1;
   speechSynthesis.speak(utter);
 }
@@ -88,7 +97,7 @@ function startVoice() {
   };
 
   recognition.onend = function() {
-    recognition.start(); // 자동 재시작
+    recognition.start();
   };
 
   recognition.start();
