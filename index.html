@@ -3,30 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>URS Earth v3.2 - 삼체 음성 인터랙션</title>
+  <title>URS Earth v3.3 - 감정 연결망</title>
   <style>
-    body { margin: 0; background: black; color: white; font-family: sans-serif; }
-    canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-    .chatbox {
-      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-      width: 90%; max-width: 600px; z-index: 2;
-    }
-    #log {
-      height: 200px; overflow-y: auto; background: rgba(0,0,0,0.4); margin-bottom: 10px;
-      padding: 10px; border-radius: 8px;
-    }
-    #userInput { width: 60%; padding: 10px; }
-    button { padding: 10px; width: 18%; }
+    body { margin: 0; background: #0a0a0a; color: white; font-family: sans-serif; overflow: hidden; }
+    #graph { width: 100vw; height: 100vh; }
   </style>
 </head>
 <body>
-  <canvas id="emotionCanvas"></canvas>
-  <div class="chatbox">
-    <div id="log">[대화 로그 시작]</div>
-    <input type="text" id="userInput" placeholder="어스에게 말 걸기..." />
-    <button onclick="send()">보내기</button>
-    <button onclick="startVoice()">🎙 음성</button>
-  </div>
+  <div id="graph"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" />
   <script src="script.js"></script>
 </body>
 </html>
