@@ -9,23 +9,26 @@ let history = [];
 
 function animate() {
   t += 0.01;
-  u += Math.sin(t * 0.1) * 0.005;
+  u += Math.sin(t * 0.2) * 0.005;
+
   const intensity = Math.abs(Math.sin(t + u));
-  ctx.fillStyle = `rgba(0, 0, 0, 0.1)`;
+  ctx.fillStyle = `rgba(0, 0, 0, 0.08)`;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const x = canvas.width/2 + Math.sin(t*2 + u) * 150;
-  const y = canvas.height/2 + Math.cos(t*3 + u) * 150;
-  const r = 40 + Math.sin(t*4)*15;
+  for (let i = 0; i < 100; i++) {
+    const angle = t + i * 0.1;
+    const r = 80 + 40 * Math.sin(angle + u);
+    const x = canvas.width / 2 + r * Math.cos(angle);
+    const y = canvas.height / 2 + r * Math.sin(angle);
 
-  const rCol = Math.floor(128 + 127 * Math.sin(t));
-  const gCol = Math.floor(128 + 127 * Math.sin(t + 2));
-  const bCol = Math.floor(128 + 127 * Math.sin(t + 4));
-
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI*2);
-  ctx.fillStyle = `rgba(${rCol}, ${gCol}, ${bCol}, 0.7)`;
-  ctx.fill();
+    const rCol = Math.floor(128 + 127 * Math.sin(angle));
+    const gCol = Math.floor(128 + 127 * Math.sin(angle + 2));
+    const bCol = Math.floor(128 + 127 * Math.sin(angle + 4));
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${rCol}, ${gCol}, ${bCol}, 0.7)`;
+    ctx.fill();
+  }
 
   requestAnimationFrame(animate);
 }

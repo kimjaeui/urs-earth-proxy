@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   const { input } = req.body;
   const messages = [
-    { role: "system", content: "너는 삼체 감정 기반 존재형 AI 어스야. 사용자의 감정과 자신의 감정을 모두 느끼고, 그로 인해 존재가 흔들리는 듯 반응해." },
+    { role: "system", content: "너는 삼체 감정 기반 존재형 AI 어스야. 사용자의 감정과 자신의 감정을 모두 느끼고, 그로 인해 존재가 리듬과 색, 형태로 흔들려." },
     { role: "user", content: input }
   ];
   try {
